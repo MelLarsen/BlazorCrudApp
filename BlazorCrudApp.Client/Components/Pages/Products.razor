@@ -1,0 +1,80 @@
+﻿@page "/products"
+@using BlazorCrudApp.Shared.Models
+@inject IHttpClientFactory HttpClientFactory
+
+<h3>Products</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in products)
+        {
+            <tr>
+                <td>@product.Name</td>
+                <td>@product.Description</td>
+                <td>@product.Price.ToString("C")</td>
+                <td>
+                    <button @onclick="() => DeleteProduct(product.Id)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a href="/create">Create New</a>
+
+@code {
+    private List<Product> products = new();
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var httpClient = HttpClientFactory.CreateClient("MyClient");
+            var response = await httpClient.GetAsync("api/products"); // Calls Server
+            response.EnsureSuccessStatusCode();
+
+            products = await response.Content.ReadFromJsonAsync<List<Product>>() ?? new List<Product>();
+            if (products.Count == 0)
+            {
+                errorMessage = "No products available.";
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"Error fetching products: {ex.Message}");
+            errorMessage = "Failed to load products. Please try again later.";
+        }
+    }
+
+    private async Task DeleteProduct(int id)
+    {
+        try
+        {
+            var httpClient = HttpClientFactory.CreateClient("MyClient");
+            var response = await httpClient.DeleteAsync($"api/products/{id}");
+            response.EnsureSuccessStatusCode();
+
+            // Refresh
+            products = await httpClient.GetFromJsonAsync<List<Product>>("api/products") ?? new List<Product>();
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"Error deleting product: {ex.Message}");
+            errorMessage = "Failed to delete the product. Please try again later.";
+        }
+    }
+}
