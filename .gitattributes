@@ -61,3 +61,6 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+# Force GitHub to recognize C# as the primary language
+*.cs linguist-detectable=true
+*.razor linguist-detectable=true

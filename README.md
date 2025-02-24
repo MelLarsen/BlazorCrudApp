@@ -47,10 +47,3 @@ This project is a **scalable CRUD operation application** built using a **3-proj
 ## Contributing
 Feel free to fork the repo and submit pull requests! 🚀
 
-## License
-[MIT](LICENSE)
-
----
-
-Let me know if you need more details before pushing this to GitHub!
-
