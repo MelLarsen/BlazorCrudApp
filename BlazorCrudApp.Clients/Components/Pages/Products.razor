@@ -69,7 +69,6 @@
             var response = await httpClient.DeleteAsync($"api/products/{id}");
             response.EnsureSuccessStatusCode();
 
-            // Refresh
             products = await httpClient.GetFromJsonAsync<List<Product>>("api/products") ?? new List<Product>();
         }
         catch (HttpRequestException ex)
