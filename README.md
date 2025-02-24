@@ -20,8 +20,8 @@ This project is a **scalable CRUD operation application** built using a **3-proj
 
 ## Implementation Progress
 - ✅ Read (Fetching products) implemented
-- ⏳ Create - **Next to be implemented**
-- ⏳ Delete - **Next to be implemented**
+- ✅ Create - (Creating products) implemented
+- ✅ Delete - (Deleting products) implemented
 - ⏳ Update - **Next to be implemented**
 
 ## Installation
