@@ -27,6 +27,7 @@
                 <td>@product.Description</td>
                 <td>@product.Price.ToString("C")</td>
                 <td>
+                    <button @onclick="() => EditProduct(product)">Edit</button>
                     <button @onclick="() => DeleteProduct(product.Id)">Delete</button>
                 </td>
             </tr>
@@ -36,16 +37,36 @@
 
 <a href="/createProduct">Create New</a>
 
+@if (isEditing)
+{
+    <div>
+        <h4>Edit Product</h4>
+        <input @bind="selectedProduct.Name" placeholder="Name" />
+        <input @bind="selectedProduct.Description" placeholder="Description" />
+        <input @bind="selectedProduct.Price" type="number" placeholder="Price" />
+
+        <button @onclick="UpdateProduct">Update</button>
+        <button @onclick="() => isEditing = false">Cancel</button>
+    </div>
+}
+
 @code {
     private List<Product> products = new();
     private string errorMessage;
+    private Product selectedProduct = new();
+    private bool isEditing = false;
 
     protected override async Task OnInitializedAsync()
+    {
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
     {
         try
         {
             var httpClient = HttpClientFactory.CreateClient("MyClient");
-            var response = await httpClient.GetAsync("api/products"); 
+            var response = await httpClient.GetAsync("api/products");
             response.EnsureSuccessStatusCode();
 
             products = await response.Content.ReadFromJsonAsync<List<Product>>() ?? new List<Product>();
@@ -61,6 +82,37 @@
         }
     }
 
+    private void EditProduct(Product product)
+    {
+        selectedProduct = new Product
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price
+            };
+        isEditing = true;
+    }
+
+    private async Task UpdateProduct()
+    {
+        try
+        {
+            var httpClient = HttpClientFactory.CreateClient("MyClient");
+            var response = await httpClient.PutAsJsonAsync($"api/products/{selectedProduct.Id}", selectedProduct);
+            response.EnsureSuccessStatusCode();
+
+            await LoadProducts();
+            isEditing = false;
+            selectedProduct = new Product();
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($"Error updating product: {ex.Message}");
+            errorMessage = "Failed to update the product. Please try again later.";
+        }
+    }
+
     private async Task DeleteProduct(int id)
     {
         try
@@ -69,7 +121,7 @@
             var response = await httpClient.DeleteAsync($"api/products/{id}");
             response.EnsureSuccessStatusCode();
 
-            products = await httpClient.GetFromJsonAsync<List<Product>>("api/products") ?? new List<Product>();
+            await LoadProducts();
         }
         catch (HttpRequestException ex)
         {
