@@ -1,0 +1,75 @@
+﻿@page "/CreateProduct"
+@using BlazorCrudApp.Shared.Models
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+
+
+<h3>Create Product</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success">@successMessage</div>
+}
+
+<div>
+    <label>Name:</label>
+    <input type="text" @bind="newProduct.Name" class="form-control" />
+</div>
+<div>
+    <label>Description:</label>
+    <textarea @bind="newProduct.Description" class="form-control"></textarea>
+</div>
+<div>
+    <label>Price:</label>
+    <input type="number" @bind="newProduct.Price" class="form-control" />
+</div>
+
+<button @onclick="CreateNewProduct" class="btn btn-primary mt-3">Create</button>
+<button @onclick="GoBack" class="btn btn-secondary mt-3">Cancel</button>
+
+@code {
+    private Product newProduct = new Product();
+    private string errorMessage;
+    private string successMessage;
+
+    private async Task CreateNewProduct()
+    {
+        Console.WriteLine(" CreateNewProduct Clicked!");
+
+        try
+        {
+            var httpClient = HttpClientFactory.CreateClient("MyClient");
+            var response = await httpClient.PostAsJsonAsync("api/products", newProduct);
+
+            if (response.IsSuccessStatusCode)
+            {
+                successMessage = " Product created successfully!";
+                newProduct = new Product();
+            }
+            else
+            {
+                var errorResponse = await response.Content.ReadAsStringAsync();
+                errorMessage = $" Error: {errorResponse}";
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            Console.WriteLine($" Error creating product: {ex.Message}");
+            errorMessage = " Failed to create product. Please try again later.";
+        }
+
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/products");
+    }
+
+}

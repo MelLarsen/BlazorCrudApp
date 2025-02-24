@@ -34,7 +34,7 @@
     </tbody>
 </table>
 
-<a href="/create">Create New</a>
+<a href="/createProduct">Create New</a>
 
 @code {
     private List<Product> products = new();
@@ -45,7 +45,7 @@
         try
         {
             var httpClient = HttpClientFactory.CreateClient("MyClient");
-            var response = await httpClient.GetAsync("api/products"); // Calls Server
+            var response = await httpClient.GetAsync("api/products"); 
             response.EnsureSuccessStatusCode();
 
             products = await response.Content.ReadFromJsonAsync<List<Product>>() ?? new List<Product>();
