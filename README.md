@@ -22,7 +22,7 @@ This project is a **scalable CRUD operation application** built using a **3-proj
 - ✅ Read (Fetching products) implemented
 - ✅ Create - (Creating products) implemented
 - ✅ Delete - (Deleting products) implemented
-- ⏳ Update - **Next to be implemented**
+- ✅ Update - (Update Products) implemented
 
 ## Installation
 1. Clone the repository:
